@@ -1,0 +1,241 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Dark mode is a class on <html>: rendered by default in app/layout.tsx and
+   removed before paint only for visitors who chose light (lib/theme.ts). */
+@custom-variant dark (&:is(.dark *));
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Design tokens — "ink and signal" (Phase 3, approved).
+   Raw palette first; the shadcn role names below map onto it so shadcn
+   components inherit the system without per-component overrides.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  color-scheme: light;
+  --paper: #f3f5f7;
+  --surface: #ffffff;
+  --rule: #d8dde4;
+  --ink: #111b2e;
+  --ink-muted: #5b6578;
+  --signal: #2b50e8;
+  --ok: #17855c;
+
+  /* Motion */
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur-base: 200ms;
+  --dur-slow: 300ms;
+
+  /* shadcn's base radius; the named radii live in @theme below */
+  --radius: 10px;
+
+  /* shadcn roles */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary: var(--surface);
+  --secondary-foreground: var(--ink);
+  --muted: var(--surface);
+  --muted-foreground: var(--ink-muted);
+  --accent: var(--paper);
+  --accent-foreground: var(--ink);
+  --destructive: #c4372f;
+  --border: var(--rule);
+  --input: var(--rule);
+  --ring: var(--signal);
+}
+
+.dark {
+  color-scheme: dark;
+  --paper: #0d1420;
+  --surface: #141c2a;
+  --rule: #26324a;
+  --ink: #e7ebf1;
+  --ink-muted: #8f9aad;
+  --signal: #7c93ff;
+  --ok: #4cc193;
+  --destructive: #f2786f;
+}
+
+@theme inline {
+  /* Palette as Tailwind colours: bg-paper, text-ink, border-rule, text-signal … */
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-rule: var(--rule);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-signal: var(--signal);
+  --color-ok: var(--ok);
+
+  /* shadcn role colours */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Typography: one grotesk for everything, mono only for real technical names */
+  --font-sans: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  /* Type scale — major third (1.25), body 17px. Display/H2/H3 are fluid.
+     These redefine Tailwind's own size names on purpose, so the class merger
+     (cn) recognises them as font sizes:
+       text-sm = small · text-base = body · text-2xl = H3 · text-4xl = H2 · text-6xl = display */
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.45;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.6;
+  --text-2xl: clamp(1.3125rem, 1.15rem + 0.6vw, 1.5625rem);
+  --text-2xl--line-height: 1.25;
+  --text-2xl--letter-spacing: -0.01em;
+  --text-4xl: clamp(1.875rem, 1.5rem + 1.4vw, 2.5rem);
+  --text-4xl--line-height: 1.1;
+  --text-4xl--letter-spacing: -0.02em;
+  --text-6xl: clamp(2.5rem, 1.6rem + 3.6vw, 4rem);
+  --text-6xl--line-height: 1.02;
+  --text-6xl--letter-spacing: -0.03em;
+
+  /* Spacing beyond Tailwind's defaults: the section rhythm */
+  --spacing-section: 8rem;
+  --spacing-section-sm: 5rem;
+
+  /* Radii by hierarchy: rounded-sm = 2px technical tokens, rounded-lg = 10px panels */
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+
+  --ease-soft: var(--ease-out-soft);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Room for the sticky nav when jumping to a section. */
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* One visible focus style everywhere, in the signal colour. */
+  :focus-visible {
+    outline: 2px solid var(--signal);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--signal) 22%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      animation-delay: 0s !important;
+      transition-duration: 0.01ms !important;
+    }
+    /* Scroll-linked, not autonomous: it moves only as the reader scrolls. */
+    .scroll-progress {
+      animation-duration: auto !important;
+    }
+  }
+}
+
+@utility measure {
+  max-width: 68ch;
+}
+
+/* ─── Hero request trace (components/sections/hero/hero-trace.tsx) ─────────
+   Resting styles are the finished state; these keyframes only supply the
+   starting frame, so the end state follows the theme and reduced motion
+   (durations and delays collapsed) simply shows it. */
+.trace-spine {
+  transform-origin: top;
+  animation: trace-draw 1.6s linear 0.2s both;
+}
+.trace-node {
+  animation: trace-node var(--dur-base) var(--ease-out-soft) both;
+  animation-delay: calc(0.2s + var(--i) * 0.2667s);
+}
+.trace-label {
+  animation: trace-label var(--dur-slow) var(--ease-out-soft) both;
+  animation-delay: calc(0.2s + var(--i) * 0.2667s);
+}
+@keyframes trace-draw {
+  from { transform: scaleY(0); }
+}
+@keyframes trace-node {
+  from { border-color: var(--rule); background-color: var(--surface); }
+}
+@keyframes trace-label {
+  from { color: var(--ink-muted); }
+}
+
+/* ─── Reading progress (components/sections/navigation/site-header.tsx) ────
+   Driven by the page's own scroll position; no JS. Hidden where unsupported. */
+.scroll-progress {
+  display: none;
+}
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    display: block;
+    animation: scroll-progress linear both;
+    animation-timeline: scroll(root block);
+  }
+}
+@keyframes scroll-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* ─── Section reveal (components/sections/shared/reveal-observer.tsx) ─────
+   One-time 200ms fade. Only hideable once the observer has run. */
+[data-reveal] {
+  transition: opacity var(--dur-base) var(--ease-out-soft);
+}
+.reveal-ready [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+}
+@media print {
+  .reveal-ready [data-reveal] {
+    opacity: 1 !important;
+  }
+}
